@@ -21,7 +21,7 @@ ThemeData get themeData => _themeData;
       themeData = darkMode;
     } else{
       if(_themeData == darkMode){
-        themeData == lightMode;
+        themeData = lightMode;
       }
     }
   }

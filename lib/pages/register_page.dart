@@ -1,42 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:food_delivery_app/components/my_button.dart';
 import 'package:food_delivery_app/components/my_textfield.dart';
-import 'package:food_delivery_app/pages/homepage.dart';
-import 'package:food_delivery_app/pages/register_page.dart';
-// import 'package:food_delivery_app/themes/theme_provider.dart';
+import 'package:food_delivery_app/pages/login_page.dart';
 
-class LoginPage extends StatefulWidget {
-  LoginPage({super.key});
+class RegisterPage extends StatefulWidget {
+  const RegisterPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<RegisterPage> createState() => _RegisterPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _RegisterPageState extends State<RegisterPage> {
+  final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passController = TextEditingController();
+  final TextEditingController confirmPassController = TextEditingController();
+
   bool _obscureText = true;
   String _errorMessage = "";
-
-  void Login (){
-
-    /*
-
-fill out authentication here..
-
-
-
-
-    */
-
-    // navigate to the home page
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => Homepage()),
-    );
-
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -57,7 +38,7 @@ fill out authentication here..
 
               // message , app slogan
               Text(
-                "Food Delivery App",
+                "Lets create an account for you",
                 style: TextStyle(
                   fontSize: 16,
                   color: Theme.of(context).colorScheme.inversePrimary,
@@ -65,6 +46,19 @@ fill out authentication here..
               ),
 
               SizedBox(height: 20),
+
+              // name textfield
+              MyTextfield(
+                controller: nameController,
+                hintText: "Enter your full name",
+                obscureText: false,
+                prefixIcon: Icon(
+                  Icons.person,
+                  color: Theme.of(context).colorScheme.inversePrimary,
+                ),
+              ),
+
+              SizedBox(height: 10),
 
               // email textfield
               MyTextfield(
@@ -99,6 +93,28 @@ fill out authentication here..
                   ),
                 ),
               ),
+              SizedBox(height: 10),
+              // confirm password textfield
+              MyTextfield(
+                controller: confirmPassController,
+                hintText: "Confirm your password",
+                obscureText: _obscureText,
+                prefixIcon: Icon(
+                  Icons.lock_open,
+                  color: Theme.of(context).colorScheme.inversePrimary,
+                ),
+                suffixIcon: GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _obscureText = !_obscureText;
+                    });
+                  },
+                  child: Icon(
+                    _obscureText ? Icons.visibility_off : Icons.visibility,
+                    color: Theme.of(context).colorScheme.inversePrimary,
+                  ),
+                ),
+              ),
               if (_errorMessage.isNotEmpty)
                 Padding(
                   padding: const EdgeInsets.only(top: 8.0),
@@ -112,15 +128,20 @@ fill out authentication here..
 
               // sign in button
               MyButton(
-                buttonText: "Login",
+                buttonText: "Register",
                 onTap: () {
                   setState(() {
-                    if (emailController.text.isEmpty ||
-                        passController.text.isEmpty) {
+                    if (nameController.text.isEmpty ||
+                        emailController.text.isEmpty ||
+                        passController.text.isEmpty ||
+                        confirmPassController.text.isEmpty) {
                       _errorMessage = "Please fill in all fields";
+                    } else if (passController.text !=
+                        confirmPassController.text) {
+                      _errorMessage = "Passwords do not match";
                     } else {
-                      Login();
-                     
+                      _errorMessage = "";
+                      // Proceed with registration
                     }
                   });
                 },
@@ -128,14 +149,14 @@ fill out authentication here..
 
               SizedBox(height: 25),
 
-              // not a member? Register Now
+              // Already a member? Login Now
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Column(
                     children: [
                       Text(
-                        "Not a member?",
+                        "Already a member?",
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.primary,
                         ),
@@ -149,12 +170,12 @@ fill out authentication here..
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => RegisterPage(),
+                              builder: (context) => LoginPage(),
                             ),
                           );
                         },
                         child: Text(
-                          "Register Now",
+                          "Login Now",
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.inversePrimary,
                           ),
