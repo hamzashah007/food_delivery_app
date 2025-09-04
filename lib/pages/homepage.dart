@@ -2,8 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:food_delivery_app/components/my_current_location.dart';
 import 'package:food_delivery_app/components/my_description_box.dart';
 import 'package:food_delivery_app/components/my_drawer.dart';
+import 'package:food_delivery_app/components/my_food_tile.dart';
 import 'package:food_delivery_app/components/my_sliver_appbar.dart';
 import 'package:food_delivery_app/components/my_tab_bar.dart';
+import 'package:food_delivery_app/models/food.dart';
+import 'package:food_delivery_app/models/restaurant.dart';
+import 'package:provider/provider.dart';
 
 class Homepage extends StatefulWidget {
   const Homepage({super.key});
@@ -21,7 +25,7 @@ class _HomepageState extends State<Homepage> with SingleTickerProviderStateMixin
   void initState() {
     // TODO: implement initState
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: FoodCategory.values.length, vsync: this);
   }
 
   @override
@@ -30,6 +34,36 @@ class _HomepageState extends State<Homepage> with SingleTickerProviderStateMixin
     _tabController.dispose();
     super.dispose();
   }
+
+
+  // sort out and return a list of food items that belong to a specific category
+  List<Food> _filterMenuByCategory(FoodCategory category, List<Food> fullMenu) {
+    // return the filtered list
+    return fullMenu.where((food) => food.category == category).toList();
+  }
+
+  // return list of foods in given category
+  List<Widget> getFoodInThisCategory(List<Food> fullMenu){
+    return FoodCategory.values.map((category) {
+      // get foods in this category
+      List<Food> categoryMenu = _filterMenuByCategory(category, fullMenu);
+      // return a list of widgets for each food item
+      return ListView.builder(
+        itemCount: categoryMenu.length,
+        physics: NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.zero,
+        itemBuilder: (context, index) {
+          Food food = categoryMenu[index];
+          return MyFoodTile(food: food, onTap: () {
+            // Handle food item tap
+          });
+        },
+      );
+    }).toList();
+
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -58,16 +92,10 @@ class _HomepageState extends State<Homepage> with SingleTickerProviderStateMixin
       ),
         )
       ],
-      body: TabBarView(
+      body: Consumer<Restaurant>(builder: (context, restaurant, child)=>TabBarView(
         controller: _tabController,
-        children: [
-          Text("Hello"),
-          Text("Flutter"),
-          Text("Code"),
-          
-        ],
-        
-      ),
+        children: getFoodInThisCategory(restaurant.menu),
+      ),)
       )
     );
   }
